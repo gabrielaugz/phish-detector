@@ -1,0 +1,43 @@
+### Java/Maven ###
+target/
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw.cmd
+mvnw
+
+### Node.js/React ###
+node_modules/
+build/
+dist/
+.npm
+.eslintcache
+.coverage
+package-lock.json
+
+### IDEs ###
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+bin/
+
+### Testes/Relatórios ###
+test-output/
+reports/
+*.jks
+*.keystore
+
+### Frontend/React ###
+.cache/
+dist/
+.eslintcache
+
+### Env ###
+.env
+*.env
