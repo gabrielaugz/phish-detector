@@ -1,42 +1,36 @@
-### Java/Maven ###
-target/
-*.jar
-*.war
-*.ear
-.mvn/
-mvnw.cmd
-mvnw
+# =============== GERAL ==================
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
 
-### Node.js/React ###
-node_modules/
-build/
-dist/
-.npm
-.eslintcache
-.coverage
-package-lock.json
+# =============== BACKEND (Java/Maven) =======
+/backend/target/
+/backend/.project
+/backend/.settings
+/backend/.classpath
+# Arquivos de log
+*.log
 
-### IDEs ###
-.idea/
-.vscode/
+# Eclipse / IntelliJ / VSCode etc. (opcionales)
 *.iml
-*.ipr
-*.iws
-.classpath
-.project
-.settings/
-bin/
+*.idea/
+*.vscode/
+*.classpath
+*.project
 
-### Testes/Relatórios ###
-test-output/
-reports/
-*.jks
-*.keystore
+# Maven wrapper binaries
+mvnw
+mvnw.cmd
+/.mvn/wrapper/maven-wrapper.jar
 
-### Frontend/React ###
-.cache/
-dist/
-.eslintcache
+# =============== FRONTEND (React) =========
+/frontend/node_modules/
+/frontend/build/
+
+# =============== ML-SERVICE (Python) ======
+/ml-service/venv/
+/ml-service/__pycache__/
+/ml-service/*.pyc
 
 ### Env ###
 .env
