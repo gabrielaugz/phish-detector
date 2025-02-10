@@ -3,33 +3,46 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import os
-import uvicorn
 
+from heuristics_utils import score_heuristics
 from gbs_helper import check_google_safe_browsing
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-VECTOR_PATH = os.path.join(BASE_DIR, "model", "vectorizer.pkl")
-MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
-
-vectorizer = joblib.load(VECTOR_PATH)
-clf = joblib.load(MODEL_PATH)
-
 app = FastAPI()
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
+VECTORIZER_PATH = os.path.join(BASE_DIR, "model", "vectorizer.pkl")
+
+clf = joblib.load(MODEL_PATH)
+vectorizer = joblib.load(VECTORIZER_PATH)
 
 class UrlItem(BaseModel):
     url: str
 
+# new idea for "phish or not"
+# score system added
 @app.post("/predict")
 def predict_url(item: UrlItem):
-    is_malicious_gsb = check_google_safe_browsing(item.url)
+    url = item.url
+    
+    heur = score_heuristics(url)
+    heur_score = heur["score"]
 
-    X = vectorizer.transform([item.url])
-    pred = clf.predict(X)
-    ml_phishing = bool(pred[0] == 1)
+    gsb_malicious = bool(check_google_safe_browsing(url))
 
-    is_phishing = is_malicious_gsb or ml_phishing
+    X = vectorizer.transform([url])  
+    ml_pred_np = clf.predict(X)[0]   # 1=phishing
+    ml_pred = int(ml_pred_np)        # native int
 
-    return {"phishing": is_phishing}
+    is_phishing = (heur_score >= 20) or gsb_malicious or (ml_pred == 1)
+    is_phishing = bool(is_phishing)
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
+    return {
+        "url": url,
+        "phishing": is_phishing,
+        "score": int(heur_score),
+        "reasons": heur["reasons"],
+        "gsb": gsb_malicious,
+        "ml_pred": ml_pred
+    }
+

@@ -4,6 +4,7 @@ import { TextField, Button, Card, CardContent, Typography } from '@mui/material'
 function UrlAnalyzer() {
   const [inputUrl, setInputUrl] = useState('');
   const [history, setHistory] = useState([]);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const analyzeUrl = async () => {
@@ -14,14 +15,21 @@ function UrlAnalyzer() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: inputUrl })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       setHistory((prev) => [...prev, data]);
+      
+      setInputUrl('');
     } catch (error) {
-      console.error('Erro ao analisar:', error);
+      console.error('Erro ao analisar a URL:', error);
+      setError('Verifique os logs.');
     } finally {
       setLoading(false);
-      setInputUrl('');
     }
   };
 
@@ -50,6 +58,21 @@ function UrlAnalyzer() {
               <Typography>URL: {item.url}</Typography>
               <Typography>Phishing: {item.phishing ? 'SIM' : 'NÃO'}</Typography>
               <Typography>Data/Hora: {item.analyzedAt}</Typography>
+
+              {item.score !== undefined && (
+                <Typography>Score de Heurísticas: {item.score}</Typography>
+              )}
+
+              {item.reasons && item.reasons.length > 0 && (
+                <div style={{ marginTop: '8px' }}>
+                  <Typography variant="subtitle1">Razões:</Typography>
+                  <ul>
+                    {item.reasons.map((reason, idx) => (
+                      <li key={idx}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}

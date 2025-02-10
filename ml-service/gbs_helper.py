@@ -1,7 +1,7 @@
 # ml-service/gbs_helper.py
 import requests
 import os
-fromt dotenv import load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -32,12 +32,11 @@ def check_google_safe_browsing(url: str) -> bool:
 
     try:
         resp = requests.post(GSB_URL, json=data)
-        resp.raise_for_status()  # Lança exceção se status != 200
+        resp.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Erro ao chamar Google Safe Browsing: {e}")
         return False
 
-    # Se deu status 200
     result = resp.json()
     if "threatMatches" in result and len(result["threatMatches"]) > 0:
         return True
