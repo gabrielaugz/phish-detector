@@ -1,6 +1,8 @@
 # ml-service/heuristics_utils.py
 import re
 import tldextract
+import datetime
+from whois_helper import check_whois_info
 
 def score_heuristics(url: str) -> dict:
     url_lower = url.lower()
@@ -109,6 +111,31 @@ def score_heuristics(url: str) -> dict:
     if ".com/" in url_lower:
         score += 10
         reasons.append("Uso suspeito de '.com/' no path (+10).")
+
+    extracted = tldextract.extract(url)
+    domain_full = extracted.domain + "." + extracted.suffix
+
+    # whois call
+    whois_data = check_whois_info(domain_full)
+    
+    if not whois_data:
+        score += 10
+        reasons.append("Não foi possível obter WHOIS (+10).")
+    else:
+        creation_date = whois_data.get("creation_date")
+        if creation_date:
+            age_in_days = (datetime.datetime.now() - creation_date).days
+            if age_in_days < 30: # < 1 month
+                score += 20
+                reasons.append("Domínio criado há menos de 30 dias (+20).")
+            elif age_in_days < 180:  # < 6 months
+                score += 10
+                reasons.append("Domínio recente (< 6 meses) (+10).")
+
+        org = whois_data.get("org", "")
+        if "privacy" in org.lower() or "unknown" in org.lower():
+            score += 5
+            reasons.append("WHOIS com privacidade ou org desconhecida (+5).")
 
     final_score = min(score, 100)
     return {
