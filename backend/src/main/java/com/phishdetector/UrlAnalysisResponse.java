@@ -1,15 +1,18 @@
 package com.phishdetector.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UrlAnalysisResponse {
-
     private String url;
     private boolean phishing;
     private LocalDateTime analyzedAt;
 
-    public UrlAnalysisResponse() {
-    }
+    // Novos campos
+    private Integer score;
+    private List<String> reasons;
+
+    public UrlAnalysisResponse() {}
 
     public UrlAnalysisResponse(String url, boolean phishing, LocalDateTime analyzedAt) {
         this.url = url;
@@ -17,6 +20,7 @@ public class UrlAnalysisResponse {
         this.analyzedAt = analyzedAt;
     }
 
+    // getters/setters
     public String getUrl() {
         return url;
     }
@@ -40,5 +44,21 @@ public class UrlAnalysisResponse {
     public void setAnalyzedAt(LocalDateTime analyzedAt) {
         this.analyzedAt = analyzedAt;
     }
-}
 
+    // getters e setters para score e reasons
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public List<String> getReasons() {
+        return reasons;
+    }
+
+    public void setReasons(List<String> reasons) {
+        this.reasons = reasons;
+    }
+}

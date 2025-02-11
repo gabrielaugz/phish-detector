@@ -2,6 +2,7 @@ package com.phishdetector.service;
 
 import com.phishdetector.model.UrlAnalysis;
 import com.phishdetector.repository.UrlAnalysisRepository;
+import com.phishdetector.dto.MLAnalysisResponse;
 import com.phishdetector.dto.UrlAnalysisResponse;
 
 import org.springframework.stereotype.Service;
@@ -23,20 +24,24 @@ public class UrlAnalysisService {
     private final String PYTHON_ML_URL = "http://localhost:5000/predict"; 
 
     public UrlAnalysisResponse analyze(String url) {
-        // Chama o serviço python
-        boolean isPhishing = analyzeUrl(url);
+        MLAnalysisResponse mlResult = callPythonService(url);
+    
+        boolean isPhishing = mlResult.isPhishing(); 
 
-        // Salva no BD
         UrlAnalysis entity = new UrlAnalysis(url, isPhishing, LocalDateTime.now());
         urlAnalysisRepository.save(entity);
-
-        // Monta response
-        return new UrlAnalysisResponse(
-            entity.getUrl(),
-            entity.getIsPhishing(),
+    
+        UrlAnalysisResponse finalResp = new UrlAnalysisResponse(
+            url,
+            isPhishing,
             entity.getAnalyzedAt()
         );
+        finalResp.setScore(mlResult.getScore());
+        finalResp.setReasons(mlResult.getReasons());
+    
+        return finalResp;
     }
+    
 
     private boolean analyzeUrl(String url) {
         Map<String, String> requestBody = new HashMap<>();
@@ -57,6 +62,28 @@ public class UrlAnalysisService {
             return (boolean) response.getBody().get("phishing");
         }
         return false;
+    }
+
+    public MLAnalysisResponse callPythonService(String url) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("url", url);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<MLAnalysisResponse> response =
+            restTemplate.exchange(
+                "http://localhost:5000/predict",
+                HttpMethod.POST,
+                request,
+                MLAnalysisResponse.class
+            );
+
+        return response.getBody();
     }
 }
 

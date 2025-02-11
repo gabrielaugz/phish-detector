@@ -58,14 +58,17 @@ function UrlAnalyzer() {
               <Typography>URL: {item.url}</Typography>
               <Typography>Phishing: {item.phishing ? 'SIM' : 'NÃO'}</Typography>
               <Typography>Data/Hora: {item.analyzedAt}</Typography>
-
+              {/* heuristic score */}
               {item.score !== undefined && (
-                <Typography>Score de Heurísticas: {item.score}</Typography>
+                <Typography>
+                  Score: {item.score}
+                </Typography>
               )}
 
+              {/* reasons */}
               {item.reasons && item.reasons.length > 0 && (
-                <div style={{ marginTop: '8px' }}>
-                  <Typography variant="subtitle1">Razões:</Typography>
+                <div>
+                  <Typography>Razões:</Typography>
                   <ul>
                     {item.reasons.map((reason, idx) => (
                       <li key={idx}>{reason}</li>
