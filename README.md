@@ -6,7 +6,7 @@ Atualmente, o projeto conta com:
 1. **Heurísticas Avançadas** para análise de URLs (palavras-chave, análise de domínio, TLD suspeitos, etc.).  
 2. **Integração com Google Safe Browsing (GSB)** para verificar se o link está em listas maliciosas.  
 3. **Modelo de Machine Learning** (scikit-learn) que, com base em features de URLs, retorna se há suspeita de phishing.  
-4. **Exibição no Frontend** (React) com histórico de análises.
+4. **Exibição no Frontend** (React) com histórico de análises, razões para o site ser classificado como phishing e sua pontuação (0-100).
 
 ---
 
